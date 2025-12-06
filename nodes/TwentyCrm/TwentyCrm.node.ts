@@ -17,7 +17,7 @@ export class TwentyCrm implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Connect with Twenty CRM API',
+		description: 'Connect with Twenty CRM API - Enhanced by Magnolia Tech',
 		defaults: {
 			name: 'Twenty CRM',
 		},
@@ -74,13 +74,18 @@ export class TwentyCrm implements INodeType {
 						value: 'workflow',
 					},
 					{
+						name: 'Metadata',
+						value: 'metadata',
+						description: 'Access schema and metadata information',
+					},
+					{
 						name: 'Custom',
 						value: 'custom',
 					},
 				],
 				default: 'person',
 			},
-			// Operations
+			// Operations for standard resources
 			{
 				displayName: 'Operation',
 				name: 'operation',
@@ -110,6 +115,12 @@ export class TwentyCrm implements INodeType {
 						action: 'Create a record',
 					},
 					{
+						name: 'Create Many',
+						value: 'createMany',
+						description: 'Create multiple records in batch',
+						action: 'Create many records',
+					},
+					{
 						name: 'Delete',
 						value: 'delete',
 						description: 'Delete a record',
@@ -133,8 +144,128 @@ export class TwentyCrm implements INodeType {
 						description: 'Update a record',
 						action: 'Update a record',
 					},
+					{
+						name: 'Upsert',
+						value: 'upsert',
+						description: 'Create or update a record based on match field',
+						action: 'Upsert a record',
+					},
 				],
 				default: 'getAll',
+			},
+			// Operations for Metadata resource
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: ['metadata'],
+					},
+				},
+				options: [
+					{
+						name: 'Get Objects',
+						value: 'getObjects',
+						description: 'List all object types and their metadata',
+						action: 'Get all objects',
+					},
+					{
+						name: 'Get Object Schema',
+						value: 'getObjectSchema',
+						description: 'Get metadata for a specific object type',
+						action: 'Get object schema',
+					},
+					{
+						name: 'Get Field Metadata',
+						value: 'getFieldMetadata',
+						description: 'Get field definitions for an object',
+						action: 'Get field metadata',
+					},
+				],
+				default: 'getObjects',
+			},
+
+			// ----------------------------------------
+			//             Metadata Fields
+			// ----------------------------------------
+			{
+				displayName: 'Object Name',
+				name: 'objectName',
+				type: 'string',
+				default: '',
+				placeholder: 'e.g., people, companies, opportunities',
+				displayOptions: {
+					show: {
+						resource: ['metadata'],
+						operation: ['getObjectSchema', 'getFieldMetadata'],
+					},
+				},
+				description: 'Name of the object type (plural form)',
+			},
+
+			// ----------------------------------------
+			//             Upsert Fields
+			// ----------------------------------------
+			{
+				displayName: 'Match Field',
+				name: 'upsertMatchField',
+				type: 'options',
+				displayOptions: {
+					show: {
+						operation: ['upsert'],
+					},
+				},
+				options: [
+					{
+						name: 'ID',
+						value: 'id',
+					},
+					{
+						name: 'Name (First + Last)',
+						value: 'name',
+					},
+					{
+						name: 'Email',
+						value: 'email',
+					},
+					{
+						name: 'Domain Name',
+						value: 'domainName',
+					},
+					{
+						name: 'Custom Field',
+						value: 'custom',
+					},
+				],
+				default: 'name',
+				description: 'Field to match existing records on',
+			},
+			{
+				displayName: 'Custom Match Field',
+				name: 'customMatchField',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['upsert'],
+						upsertMatchField: ['custom'],
+					},
+				},
+				default: '',
+				description: 'Name of the custom field to match on',
+			},
+			{
+				displayName: 'Match Value',
+				name: 'upsertMatchValue',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['upsert'],
+					},
+				},
+				default: '',
+				description: 'Value to match against (for non-name fields)',
 			},
 
 			// ----------------------------------------
@@ -165,7 +296,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['person'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -177,7 +308,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['person'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -190,7 +321,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['person'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -202,7 +333,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['person'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -214,7 +345,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['person'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -226,7 +357,44 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['person'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
+					},
+				},
+			},
+			{
+				displayName: 'Company ID',
+				name: 'companyId',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['person'],
+						operation: ['create', 'update', 'upsert'],
+					},
+				},
+				description: 'ID of the company to associate with this person',
+			},
+			{
+				displayName: 'LinkedIn URL',
+				name: 'linkedinUrl',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['person'],
+						operation: ['create', 'update', 'upsert'],
+					},
+				},
+			},
+			{
+				displayName: 'X (Twitter) URL',
+				name: 'xUrl',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['person'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -243,7 +411,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['company'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -256,7 +424,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['company'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -268,7 +436,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['company'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -280,7 +448,19 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['company'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
+					},
+				},
+			},
+			{
+				displayName: 'LinkedIn URL',
+				name: 'companyLinkedinUrl',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['company'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -297,7 +477,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['task', 'note'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -312,7 +492,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['task', 'note'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -338,7 +518,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['task'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -350,7 +530,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['task'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -367,7 +547,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['opportunity'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -379,7 +559,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['opportunity'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -417,7 +597,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['opportunity'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -433,7 +613,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['opportunity'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -445,7 +625,7 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['opportunity'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 			},
@@ -474,10 +654,26 @@ export class TwentyCrm implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['custom'],
-						operation: ['create', 'update'],
+						operation: ['create', 'update', 'upsert'],
 					},
 				},
 				description: 'JSON object with field values',
+			},
+
+			// ----------------------------------------
+			//             Batch Operations Fields
+			// ----------------------------------------
+			{
+				displayName: 'Records JSON',
+				name: 'batchRecords',
+				type: 'json',
+				default: '[]',
+				displayOptions: {
+					show: {
+						operation: ['createMany'],
+					},
+				},
+				description: 'JSON array of records to create',
 			},
 
 			// ----------------------------------------
@@ -555,6 +751,22 @@ export class TwentyCrm implements INodeType {
 					},
 				],
 			},
+
+			// ----------------------------------------
+			//             Additional Fields (for create/update/upsert)
+			// ----------------------------------------
+			{
+				displayName: 'Additional Fields',
+				name: 'additionalFields',
+				type: 'json',
+				default: '{}',
+				displayOptions: {
+					show: {
+						operation: ['create', 'update', 'upsert'],
+					},
+				},
+				description: 'Additional fields as JSON (for custom fields or relationships)',
+			},
 		],
 	};
 
@@ -579,6 +791,71 @@ export class TwentyCrm implements INodeType {
 			workflow: 'workflows',
 		};
 
+		// Handle Metadata operations
+		if (resource === 'metadata') {
+			try {
+				let responseData;
+				const baseUrl = credentials.apiUrl as string;
+
+				if (operation === 'getObjects') {
+					const options = {
+						method: 'GET' as IHttpRequestMethods,
+						uri: `${baseUrl}/rest/metadata/objects`,
+						json: true,
+					};
+					responseData = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'twentyCrmApi',
+						options as any,
+					);
+				}
+
+				if (operation === 'getObjectSchema') {
+					const objectName = this.getNodeParameter('objectName', 0) as string;
+					const options = {
+						method: 'GET' as IHttpRequestMethods,
+						uri: `${baseUrl}/rest/metadata/objects/${objectName}`,
+						json: true,
+					};
+					responseData = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'twentyCrmApi',
+						options as any,
+					);
+				}
+
+				if (operation === 'getFieldMetadata') {
+					const objectName = this.getNodeParameter('objectName', 0) as string;
+					const options = {
+						method: 'GET' as IHttpRequestMethods,
+						uri: `${baseUrl}/rest/metadata/objects/${objectName}/fields`,
+						json: true,
+					};
+					responseData = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'twentyCrmApi',
+						options as any,
+					);
+				}
+
+				const executionData = this.helpers.constructExecutionMetaData(
+					this.helpers.returnJsonArray(responseData),
+					{ itemData: { item: 0 } },
+				);
+				returnData.push(...executionData);
+				return [returnData];
+			} catch (error: any) {
+				if (this.continueOnFail()) {
+					returnData.push({
+						json: { error: error.message, resource, operation },
+						pairedItem: { item: 0 },
+					});
+					return [returnData];
+				}
+				throw new NodeOperationError(this.getNode(), error, { itemIndex: 0 });
+			}
+		}
+
 		for (let i = 0; i < items.length; i++) {
 			try {
 				let responseData;
@@ -589,73 +866,118 @@ export class TwentyCrm implements INodeType {
 					endpoint = this.getNodeParameter('customResource', i) as string;
 				}
 
+				const baseUrl = credentials.apiUrl as string;
 				const options: IDataObject = {
 					method: 'GET' as IHttpRequestMethods,
-					uri: `${credentials.apiUrl}/rest/${endpoint}`,
+					uri: `${baseUrl}/rest/${endpoint}`,
 					json: true,
+				};
+
+				// Helper function to build body for person resource
+				const buildPersonBody = (index: number): IDataObject => {
+					const body: IDataObject = {};
+					const firstName = this.getNodeParameter('firstName', index, '') as string;
+					const lastName = this.getNodeParameter('lastName', index, '') as string;
+					
+					if (firstName || lastName) {
+						body.name = {
+							firstName: firstName || '',
+							lastName: lastName || '',
+						};
+					}
+					
+					const email = this.getNodeParameter('email', index, '') as string;
+					if (email) {
+						body.emails = {
+							primaryEmail: email,
+							additionalEmails: [],
+						};
+					}
+
+					const phone = this.getNodeParameter('phone', index, '') as string;
+					if (phone) {
+						body.phones = {
+							primaryPhoneNumber: phone,
+							primaryPhoneCountryCode: 'US',
+							additionalPhones: [],
+						};
+					}
+
+					const jobTitle = this.getNodeParameter('jobTitle', index, '') as string;
+					if (jobTitle) body.jobTitle = jobTitle;
+
+					const city = this.getNodeParameter('city', index, '') as string;
+					if (city) body.city = city;
+
+					const companyId = this.getNodeParameter('companyId', index, '') as string;
+					if (companyId) body.companyId = companyId;
+
+					const linkedinUrl = this.getNodeParameter('linkedinUrl', index, '') as string;
+					if (linkedinUrl) {
+						body.linkedinLink = {
+							primaryLinkLabel: 'LinkedIn',
+							primaryLinkUrl: linkedinUrl,
+						};
+					}
+
+					const xUrl = this.getNodeParameter('xUrl', index, '') as string;
+					if (xUrl) {
+						body.xLink = {
+							primaryLinkLabel: 'X',
+							primaryLinkUrl: xUrl,
+						};
+					}
+
+					return body;
+				};
+
+				// Helper function to build body for company resource
+				const buildCompanyBody = (index: number): IDataObject => {
+					const body: IDataObject = {};
+					
+					body.name = this.getNodeParameter('name', index) as string;
+					
+					const domainName = this.getNodeParameter('domainName', index, '') as string;
+					if (domainName) {
+						body.domainName = {
+							primaryLinkLabel: domainName,
+							primaryLinkUrl: `https://${domainName}`,
+						};
+					}
+
+					const employees = this.getNodeParameter('employees', index, 0) as number;
+					if (employees > 0) body.employees = employees;
+
+					const address = this.getNodeParameter('address', index, '') as string;
+					if (address) {
+						body.address = {
+							addressStreet1: address,
+							addressCity: '',
+							addressCountry: '',
+						};
+					}
+
+					const linkedinUrl = this.getNodeParameter('companyLinkedinUrl', index, '') as string;
+					if (linkedinUrl) {
+						body.linkedinLink = {
+							primaryLinkLabel: 'LinkedIn',
+							primaryLinkUrl: linkedinUrl,
+						};
+					}
+
+					return body;
 				};
 
 				if (operation === 'create') {
 					options.method = 'POST';
-					const body: IDataObject = {};
+					let body: IDataObject = {};
 
 					if (resource === 'person') {
-						const firstName = this.getNodeParameter('firstName', i, '') as string;
-						const lastName = this.getNodeParameter('lastName', i, '') as string;
-						
-						if (firstName || lastName) {
-							body.name = {
-								firstName: firstName || '',
-								lastName: lastName || '',
-							};
-						}
-						
-						const email = this.getNodeParameter('email', i, '') as string;
-						if (email) {
-							body.emails = {
-								primaryEmail: email,
-								additionalEmails: [],
-							};
-						}
-
-						const phone = this.getNodeParameter('phone', i, '') as string;
-						if (phone) {
-							body.phones = {
-								primaryPhoneNumber: phone,
-								primaryPhoneCountryCode: 'US',
-								additionalPhones: [],
-							};
-						}
-
-						const jobTitle = this.getNodeParameter('jobTitle', i, '') as string;
-						if (jobTitle) body.jobTitle = jobTitle;
-
-						const city = this.getNodeParameter('city', i, '') as string;
-						if (city) body.city = city;
+						body = buildPersonBody(i);
 					}
 
 					if (resource === 'company') {
-						body.name = this.getNodeParameter('name', i) as string;
-						
-						const domainName = this.getNodeParameter('domainName', i, '') as string;
-						if (domainName) {
-							body.domainName = {
-								primaryLinkLabel: domainName,
-								primaryLinkUrl: `https://${domainName}`,
-							};
-						}
-
-						const employees = this.getNodeParameter('employees', i, 0) as number;
-						if (employees > 0) body.employees = employees;
-
-						const address = this.getNodeParameter('address', i, '') as string;
-						if (address) {
-							body.address = {
-								addressStreet1: address,
-								addressCity: '',
-								addressCountry: '',
-							};
-						}
+						body = buildCompanyBody(i);
 					}
 
 					if (resource === 'task') {
@@ -695,12 +1017,146 @@ export class TwentyCrm implements INodeType {
 						}
 					}
 
+					// Merge additional fields
+					const additionalFields = this.getNodeParameter('additionalFields', i, '{}') as string;
+					try {
+						const additional = typeof additionalFields === 'string' ? JSON.parse(additionalFields) : additionalFields;
+						Object.assign(body, additional);
+					} catch (error) {
+						// Ignore parse errors for additional fields
+					}
+
 					options.body = body;
+				}
+
+				if (operation === 'createMany') {
+					options.method = 'POST';
+					options.uri = `${baseUrl}/rest/${endpoint}/batch`;
+					
+					const batchRecords = this.getNodeParameter('batchRecords', i, '[]') as string;
+					try {
+						const records = JSON.parse(batchRecords);
+						options.body = { data: records };
+					} catch (error) {
+						throw new NodeOperationError(this.getNode(), 'Invalid JSON in Records', { itemIndex: i });
+					}
+				}
+
+				if (operation === 'upsert') {
+					// First, search for existing record
+					const matchField = this.getNodeParameter('upsertMatchField', i) as string;
+					let existingRecord = null;
+
+					// Build search filter based on match field
+					const filter: IDataObject = {};
+					
+					if (matchField === 'name' && resource === 'person') {
+						const firstName = this.getNodeParameter('firstName', i, '') as string;
+						const lastName = this.getNodeParameter('lastName', i, '') as string;
+						filter['name'] = {
+							firstName: { eq: firstName },
+							lastName: { eq: lastName },
+						};
+					} else if (matchField === 'email' && resource === 'person') {
+						const matchValue = this.getNodeParameter('upsertMatchValue', i, '') as string;
+						filter['emails'] = {
+							primaryEmail: { eq: matchValue },
+						};
+					} else if (matchField === 'domainName' && resource === 'company') {
+						const matchValue = this.getNodeParameter('upsertMatchValue', i, '') as string;
+						filter['domainName'] = {
+							primaryLinkUrl: { contains: matchValue },
+						};
+					} else if (matchField === 'id') {
+						const matchValue = this.getNodeParameter('upsertMatchValue', i, '') as string;
+						filter['id'] = { eq: matchValue };
+					} else if (matchField === 'custom') {
+						const customField = this.getNodeParameter('customMatchField', i) as string;
+						const matchValue = this.getNodeParameter('upsertMatchValue', i, '') as string;
+						filter[customField] = { eq: matchValue };
+					}
+
+					// Search with full pagination to find existing record
+					const searchOptions = {
+						method: 'GET' as IHttpRequestMethods,
+						uri: `${baseUrl}/rest/${endpoint}`,
+						qs: {
+							first: 100,
+							filter: JSON.stringify(filter),
+						},
+						json: true,
+					};
+
+					let searchResponse = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'twentyCrmApi',
+						searchOptions as any,
+					);
+
+					// Check if we found a match
+					const resourceKey = Object.keys(searchResponse.data || {})[0];
+					let allRecords = searchResponse.data?.[resourceKey] || [];
+
+					// Paginate through all results if needed
+					while (searchResponse.pageInfo?.hasNextPage) {
+						const nextOptions = {
+							...searchOptions,
+							qs: {
+								...searchOptions.qs,
+								after: searchResponse.pageInfo.endCursor,
+							},
+						};
+						searchResponse = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'twentyCrmApi',
+							nextOptions as any,
+						);
+						if (searchResponse.data?.[resourceKey]) {
+							allRecords = allRecords.concat(searchResponse.data[resourceKey]);
+						}
+					}
+
+					existingRecord = allRecords.length > 0 ? allRecords[0] : null;
+
+					// Build the body
+					let body: IDataObject = {};
+					if (resource === 'person') {
+						body = buildPersonBody(i);
+					} else if (resource === 'company') {
+						body = buildCompanyBody(i);
+					} else if (resource === 'custom') {
+						const fieldsJson = this.getNodeParameter('fieldsJson', i, '{}') as string;
+						try {
+							Object.assign(body, JSON.parse(fieldsJson));
+						} catch (error) {
+							throw new NodeOperationError(this.getNode(), 'Invalid JSON in Fields', { itemIndex: i });
+						}
+					}
+
+					// Merge additional fields
+					const additionalFields = this.getNodeParameter('additionalFields', i, '{}') as string;
+					try {
+						const additional = typeof additionalFields === 'string' ? JSON.parse(additionalFields) : additionalFields;
+						Object.assign(body, additional);
+					} catch (error) {
+						// Ignore parse errors
+					}
+
+					if (existingRecord) {
+						// Update existing record
+						options.method = 'PATCH';
+						options.uri = `${baseUrl}/rest/${endpoint}/${existingRecord.id}`;
+						options.body = body;
+					} else {
+						// Create new record
+						options.method = 'POST';
+						options.body = body;
+					}
 				}
 
 				if (operation === 'get') {
 					const id = this.getNodeParameter('id', i) as string;
-					options.uri = `${credentials.apiUrl}/rest/${endpoint}/${id}`;
+					options.uri = `${baseUrl}/rest/${endpoint}/${id}`;
 				}
 
 				if (operation === 'getAll') {
@@ -713,7 +1169,7 @@ export class TwentyCrm implements INodeType {
 					if (!returnAll) {
 						qs.first = limit;
 					} else {
-						qs.first = 1000;
+						qs.first = 100; // Fetch in batches of 100 for full pagination
 					}
 					
 					if (additionalOptions.orderBy) {
@@ -738,32 +1194,15 @@ export class TwentyCrm implements INodeType {
 				if (operation === 'update') {
 					options.method = 'PATCH';
 					const id = this.getNodeParameter('id', i) as string;
-					options.uri = `${credentials.apiUrl}/rest/${endpoint}/${id}`;
+					options.uri = `${baseUrl}/rest/${endpoint}/${id}`;
 					
-					const updateBody: IDataObject = {};
+					let updateBody: IDataObject = {};
 					
-					// Similar field handling as create
 					if (resource === 'person') {
-						const firstName = this.getNodeParameter('firstName', i, '') as string;
-						const lastName = this.getNodeParameter('lastName', i, '') as string;
-						
-						if (firstName || lastName) {
-							updateBody.name = {
-								firstName: firstName || '',
-								lastName: lastName || '',
-							};
-						}
-						
-						const email = this.getNodeParameter('email', i, '') as string;
-						if (email) {
-							updateBody.emails = {
-								primaryEmail: email,
-								additionalEmails: [],
-							};
-						}
-					}
-					
-					if (resource === 'custom') {
+						updateBody = buildPersonBody(i);
+					} else if (resource === 'company') {
+						updateBody = buildCompanyBody(i);
+					} else if (resource === 'custom') {
 						const fieldsJson = this.getNodeParameter('fieldsJson', i, '{}') as string;
 						try {
 							Object.assign(updateBody, JSON.parse(fieldsJson));
@@ -771,15 +1210,23 @@ export class TwentyCrm implements INodeType {
 							throw new NodeOperationError(this.getNode(), 'Invalid JSON in Fields', { itemIndex: i });
 						}
 					}
+
+					// Merge additional fields
+					const additionalFields = this.getNodeParameter('additionalFields', i, '{}') as string;
+					try {
+						const additional = typeof additionalFields === 'string' ? JSON.parse(additionalFields) : additionalFields;
+						Object.assign(updateBody, additional);
+					} catch (error) {
+						// Ignore parse errors
+					}
 					
-					// Add other resource update fields as needed
 					options.body = updateBody;
 				}
 
 				if (operation === 'delete') {
 					options.method = 'DELETE';
 					const id = this.getNodeParameter('id', i) as string;
-					options.uri = `${credentials.apiUrl}/rest/${endpoint}/${id}`;
+					options.uri = `${baseUrl}/rest/${endpoint}/${id}`;
 				}
 
 				responseData = await this.helpers.httpRequestWithAuthentication.call(
@@ -788,17 +1235,18 @@ export class TwentyCrm implements INodeType {
 					options as any,
 				);
 
-				// Handle response
+				// Handle response for getAll with full pagination
 				if (operation === 'getAll' && responseData.data) {
 					const resourceKey = Object.keys(responseData.data)[0];
 					if (responseData.data[resourceKey]) {
-						// Handle pagination for returnAll
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 						if (returnAll && responseData.pageInfo?.hasNextPage) {
 							let allData = responseData.data[resourceKey];
 							let nextCursor = responseData.pageInfo.endCursor;
+							let pageCount = 1;
+							const maxPages = 100; // Safety limit
 							
-							while (nextCursor) {
+							while (nextCursor && pageCount < maxPages) {
 								const nextOptions = { 
 									...options, 
 									qs: { ...(options.qs as IDataObject), after: nextCursor } 
@@ -813,6 +1261,7 @@ export class TwentyCrm implements INodeType {
 								if (nextResponse.data && nextResponse.data[resourceKey]) {
 									allData = allData.concat(nextResponse.data[resourceKey]);
 									nextCursor = nextResponse.pageInfo?.hasNextPage ? nextResponse.pageInfo.endCursor : null;
+									pageCount++;
 								} else {
 									break;
 								}

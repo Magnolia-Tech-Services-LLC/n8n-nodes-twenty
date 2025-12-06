@@ -1,19 +1,28 @@
 {
-  "name": "n8n-nodes-twentycrm",
-  "version": "0.1.7",
-  "description": "n8n node for Twenty CRM integration",
+  "name": "@magnolia-tech/n8n-nodes-twenty",
+  "version": "0.2.0",
+  "description": "n8n node for Twenty CRM integration - Magnolia Tech fork with enhanced features",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "twenty",
+    "crm",
+    "magnolia-tech"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/betterk8s-com/n8n-nodes-twenty",
+  "homepage": "https://github.com/Magnolia-Tech-Services-LLC/n8n-nodes-twenty",
   "author": {
-    "name": "Stefan Krempel",
-    "email": "stefan@example.com"
+    "name": "Magnolia Tech Services, LLC",
+    "email": "hello@magnoliatechservices.com"
   },
+  "contributors": [
+    {
+      "name": "Stefan Krempel",
+      "email": "stefan@example.com"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/betterk8s-com/n8n-nodes-twenty.git"
+    "url": "https://github.com/Magnolia-Tech-Services-LLC/n8n-nodes-twenty.git"
   },
   "engines": {
     "node": ">=20.15"
