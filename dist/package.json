@@ -1,0 +1,62 @@
+{
+    "name": "@magnolia-tech/n8n-nodes-twenty",
+    "version": "0.2.0",
+    "description": "n8n node for Twenty CRM integration - Magnolia Tech fork with enhanced features",
+    "keywords": [
+        "n8n-community-node-package",
+        "twenty",
+        "crm",
+        "magnolia-tech"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/Magnolia-Tech-Services-LLC/n8n-nodes-twenty",
+    "author": {
+        "name": "Magnolia Tech Services, LLC",
+        "email": "hello@magnoliatechservices.com"
+    },
+    "contributors": [
+        {
+            "name": "Stefan Krempel",
+            "email": "stefan@example.com"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Magnolia-Tech-Services-LLC/n8n-nodes-twenty.git"
+    },
+    "engines": {
+        "node": ">=20.15"
+    },
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "npx rimraf dist && tsc && gulp build:icons",
+        "dev": "tsc --watch",
+        "format": "prettier nodes credentials --write",
+        "lint": "eslint nodes credentials package.json",
+        "lintfix": "eslint nodes credentials package.json --fix",
+        "prepublishOnly": "npm run build"
+    },
+    "files": [
+        "dist"
+    ],
+    "n8n": {
+        "n8nNodesApiVersion": 1,
+        "credentials": [
+            "dist/credentials/TwentyCrmApi.credentials.js"
+        ],
+        "nodes": [
+            "dist/nodes/TwentyCrm/TwentyCrm.node.js"
+        ]
+    },
+    "devDependencies": {
+        "@typescript-eslint/parser": "~8.32.0",
+        "eslint": "^8.57.0",
+        "eslint-plugin-n8n-nodes-base": "^1.16.3",
+        "gulp": "^5.0.0",
+        "prettier": "^3.5.3",
+        "typescript": "^5.8.2"
+    },
+    "peerDependencies": {
+        "n8n-workflow": "*"
+    }
+}
