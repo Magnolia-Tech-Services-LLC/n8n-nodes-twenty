@@ -878,36 +878,36 @@ export class TwentyCrm implements INodeType {
 					const body: IDataObject = {};
 					const firstName = this.getNodeParameter('firstName', index, '') as string;
 					const lastName = this.getNodeParameter('lastName', index, '') as string;
-					
-					if (firstName || lastName) {
-						body.name = {
-							firstName: firstName || '',
-							lastName: lastName || '',
-						};
-					}
-					
+						
+						if (firstName || lastName) {
+							body.name = {
+								firstName: firstName || '',
+								lastName: lastName || '',
+							};
+						}
+						
 					const email = this.getNodeParameter('email', index, '') as string;
-					if (email) {
-						body.emails = {
-							primaryEmail: email,
-							additionalEmails: [],
-						};
-					}
+						if (email) {
+							body.emails = {
+								primaryEmail: email,
+								additionalEmails: [],
+							};
+						}
 
 					const phone = this.getNodeParameter('phone', index, '') as string;
-					if (phone) {
-						body.phones = {
-							primaryPhoneNumber: phone,
-							primaryPhoneCountryCode: 'US',
-							additionalPhones: [],
-						};
-					}
+						if (phone) {
+							body.phones = {
+								primaryPhoneNumber: phone,
+								primaryPhoneCountryCode: 'US',
+								additionalPhones: [],
+							};
+						}
 
 					const jobTitle = this.getNodeParameter('jobTitle', index, '') as string;
-					if (jobTitle) body.jobTitle = jobTitle;
+						if (jobTitle) body.jobTitle = jobTitle;
 
 					const city = this.getNodeParameter('city', index, '') as string;
-					if (city) body.city = city;
+						if (city) body.city = city;
 
 					const companyId = this.getNodeParameter('companyId', index, '') as string;
 					if (companyId) body.companyId = companyId;
@@ -936,26 +936,26 @@ export class TwentyCrm implements INodeType {
 					const body: IDataObject = {};
 					
 					body.name = this.getNodeParameter('name', index) as string;
-					
+						
 					const domainName = this.getNodeParameter('domainName', index, '') as string;
-					if (domainName) {
-						body.domainName = {
-							primaryLinkLabel: domainName,
-							primaryLinkUrl: `https://${domainName}`,
-						};
-					}
+						if (domainName) {
+							body.domainName = {
+								primaryLinkLabel: domainName,
+								primaryLinkUrl: `https://${domainName}`,
+							};
+						}
 
 					const employees = this.getNodeParameter('employees', index, 0) as number;
-					if (employees > 0) body.employees = employees;
+						if (employees > 0) body.employees = employees;
 
 					const address = this.getNodeParameter('address', index, '') as string;
-					if (address) {
-						body.address = {
-							addressStreet1: address,
-							addressCity: '',
-							addressCountry: '',
-						};
-					}
+						if (address) {
+							body.address = {
+								addressStreet1: address,
+								addressCity: '',
+								addressCountry: '',
+							};
+						}
 
 					const linkedinUrl = this.getNodeParameter('companyLinkedinUrl', index, '') as string;
 					if (linkedinUrl) {
@@ -1210,7 +1210,7 @@ export class TwentyCrm implements INodeType {
 							throw new NodeOperationError(this.getNode(), 'Invalid JSON in Fields', { itemIndex: i });
 						}
 					}
-
+					
 					// Merge additional fields
 					const additionalFields = this.getNodeParameter('additionalFields', i, '{}') as string;
 					try {
